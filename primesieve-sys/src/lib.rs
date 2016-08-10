@@ -31,4 +31,26 @@ extern "C" {
                                       -> *mut c_void;
     pub fn primesieve_generate_n_primes(n: uint64_t, start: uint64_t, type_: c_int) -> *mut c_void;
     pub fn primesieve_nth_prime(n: int64_t, start: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_nth_prime(n: int64_t, start: uint64_t) -> uint64_t;
+    pub fn primesieve_count_primes(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_count_twins(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_count_triplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_count_quadruplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_count_quintuplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_count_sextuplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_count_primes(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_count_twins(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_count_triplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_count_quadruplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_count_quintuplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_parallel_count_sextuplets(start: uint64_t, stop: uint64_t) -> uint64_t;
+    pub fn primesieve_print_primes(start: uint64_t, stop: uint64_t);
+    pub fn primesieve_print_twins(start: uint64_t, stop: uint64_t);
+    pub fn primesieve_print_triplets(start: uint64_t, stop: uint64_t);
+    pub fn primesieve_print_quadruplets(start: uint64_t, stop: uint64_t);
+    pub fn primesieve_print_quintuplets(start: uint64_t, stop: uint64_t);
+    pub fn primesieve_print_sextuplets(start: uint64_t, stop: uint64_t);
+    pub fn primesieve_callback_primes(start: uint64_t,
+                                      stop: uint64_t,
+                                      callback: extern "C" fn(prime: uint64_t));
 }
