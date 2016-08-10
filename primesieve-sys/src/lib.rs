@@ -1,10 +1,11 @@
 extern crate libc;
-use libc::{uint64_t, c_int, c_void, size_t};
+use libc::{c_int, c_void, int64_t, size_t, uint64_t};
 
-// This `const` is a `#define` in the original C header.
+// This `const` is a `#define` in the original C header ("primesieve.h").
 pub const PRIMESIEVE_ERROR: uint64_t = !(0 as uint64_t) as uint64_t;
 
-// These `const`s are an anonymous enum in the original C header.
+// These `const`s are an anonymous enum in the original C header
+// ("primesieve.h").
 pub const SHORT_PRIMES: c_int = 0;
 pub const USHORT_PRIMES: c_int = 1;
 pub const INT_PRIMES: c_int = 2;
@@ -22,11 +23,12 @@ pub const UINT64_PRIMES: c_int = 13;
 
 #[link(name = "primesieve")]
 extern "C" {
+    // These `fn`s are from the C header "primesieve.h".
     pub fn primesieve_generate_primes(start: uint64_t,
                                       stop: uint64_t,
                                       size: *mut size_t,
                                       type_: c_int)
                                       -> *mut c_void;
-
     pub fn primesieve_generate_n_primes(n: uint64_t, start: uint64_t, type_: c_int) -> *mut c_void;
+    pub fn primesieve_nth_prime(n: int64_t, start: uint64_t) -> uint64_t;
 }
