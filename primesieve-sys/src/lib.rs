@@ -27,4 +27,6 @@ extern "C" {
                                       size: *mut size_t,
                                       type_: c_int)
                                       -> *mut c_void;
+
+    pub fn primesieve_generate_n_primes(n: uint64_t, start: uint64_t, type_: c_int) -> *mut c_void;
 }
