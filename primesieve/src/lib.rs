@@ -121,9 +121,8 @@ impl Count {
         }
     }
 
-    pub fn tupling<T: ToOwned>(mut self, tupling: T) -> Option<Self>
-        where T::Owned: ToTupling {
-        if let Some(t) = tupling.to_owned().to_tupling() {
+    pub fn tupling<T: ToTupling>(mut self, tupling: T) -> Option<Self> {
+        if let Some(t) = tupling.to_tupling() {
             self.tupling = t;
             Some(self)
         } else {
@@ -131,21 +130,18 @@ impl Count {
         }
     }
 
-    pub fn is_parallel<B: ToOwned>(mut self, is_parallel: B) -> Self
-        where B::Owned: Into<bool> {
-        self.is_parallel = is_parallel.to_owned().into();
+    pub fn is_parallel<B: Into<bool>>(mut self, is_parallel: B) -> Self {
+        self.is_parallel = is_parallel.into();
         self
     }
 
-    pub fn start<N: ToOwned>(mut self, start: N) -> Self
-        where N::Owned: Into<u64> {
-        self.start = start.to_owned().into();
+    pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
+        self.start = start.into();
         self
     }
 
-    pub fn stop<N: ToOwned>(mut self, stop: N) -> Self
-        where N::Owned: Into<u64> {
-        self.stop = stop.to_owned().into();
+    pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
+        self.stop = stop.into();
         self
     }
 
@@ -212,15 +208,13 @@ impl Nth {
         }
     }
 
-    pub fn is_parallel<B: ToOwned>(mut self, is_parallel: B) -> Self
-        where B::Owned: Into<bool> {
-        self.is_parallel = is_parallel.to_owned().into();
+    pub fn is_parallel<B: Into<bool>>(mut self, is_parallel: B) -> Self {
+        self.is_parallel = is_parallel.into();
         self
     }
 
-    pub fn after<N: ToOwned>(mut self, n: N) -> Option<Self>
-        where N::Owned: Into<u64> {
-        if let Some(n_) = num_cast::<u64, libc::int64_t>(n.to_owned().into()) {
+    pub fn after<N: Into<u64>>(mut self, n: N) -> Option<Self> {
+        if let Some(n_) = num_cast::<u64, libc::int64_t>(n.into()) {
             if n_ >= 0 {
                 self.n = -n_;
                 Some(self)
@@ -232,9 +226,8 @@ impl Nth {
         }
     }
 
-    pub fn before<N: ToOwned>(mut self, n: N) -> Option<Self>
-        where N::Owned: Into<u64> {
-        if let Some(n_) = num_cast::<u64, libc::int64_t>(n.to_owned().into()) {
+    pub fn before<N: Into<u64>>(mut self, n: N) -> Option<Self> {
+        if let Some(n_) = num_cast::<u64, libc::int64_t>(n.into()) {
             if n_ > 0 {
                 self.n = -n_;
                 Some(self)
@@ -246,9 +239,8 @@ impl Nth {
         }
     }
 
-    pub fn start<N: ToOwned>(mut self, start: N) -> Self
-        where N::Owned: Into<u64> {
-        self.start = start.to_owned().into();
+    pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
+        self.start = start.into();
         self
     }
 
