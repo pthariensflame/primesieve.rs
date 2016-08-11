@@ -13,4 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+extern crate snowflake;
+use snowflake::ProcessUniqueId;
+
 pub extern crate primesieve_sys as raw;
