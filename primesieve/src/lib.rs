@@ -221,8 +221,12 @@ impl Nth {
     pub fn after<N: ToOwned>(mut self, n: N) -> Option<Self>
         where N::Owned: Into<u64> {
         if let Some(n_) = num_cast::<u64, libc::int64_t>(n.to_owned().into()) {
-            self.n = n_;
-            Some(self)
+            if n_ >= 0 {
+                self.n = -n_;
+                Some(self)
+            } else {
+                None
+            }
         } else {
             None
         }
