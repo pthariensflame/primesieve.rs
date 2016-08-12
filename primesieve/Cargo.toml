@@ -29,5 +29,4 @@ path = "src/lib.rs"
 [dependencies]
 libc = "~0.2.15"
 primesieve-sys = "~0.1.0"
-snowflake = "~1.2.0"
-num-traits = "*"
+num-traits = "~0.1.34"

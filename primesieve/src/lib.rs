@@ -13,14 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
+use std::slice;
 
 pub extern crate libc;
 
 pub extern crate primesieve_sys as raw;
-
-extern crate snowflake;
-use snowflake::ProcessUniqueId;
 
 extern crate num_traits;
 use num_traits::cast::cast as num_cast;
@@ -56,23 +53,30 @@ pub mod sieve_size {
 pub mod num_threads {
     use super::num_traits::cast::cast as num_cast;
 
-    pub fn set<N: Into<u16>>(sieve_size: N) -> bool {
-        if let Some(n_) = num_cast::<u16, super::libc::c_int>(sieve_size.into()) {
-            if n_ >= 1 && n_ <= 2048 {
-                unsafe {
-                    super::raw::primesieve_set_sieve_size(n_);
+    pub fn set<N: Into<Option<u64>>>(num_threads: N) -> bool {
+        if let Some(n) = num_threads.into() {
+            if let Some(n_) = num_cast::<u64, super::libc::c_int>(n) {
+                if n_ >= 1 {
+                    unsafe {
+                        super::raw::primesieve_set_num_threads(n_);
+                    }
+                    true
+                } else {
+                    false
                 }
-                true
             } else {
                 false
             }
         } else {
-            false
+            unsafe {
+                super::raw::primesieve_set_num_threads(-1);
+            }
+            true
         }
     }
 
-    pub fn get() -> u16 {
-        num_cast::<super::libc::c_int, u16>(unsafe { super::raw::primesieve_get_sieve_size() })
+    pub fn get() -> u64 {
+        num_cast::<super::libc::c_int, u64>(unsafe { super::raw::primesieve_get_num_threads() })
             .unwrap_or_else(|| unreachable!())
     }
 }
@@ -198,8 +202,8 @@ impl Count {
         self
     }
 
-    pub fn get(self) -> u64 {
-        if self.is_parallel {
+    pub fn get(self) -> Option<u64> {
+        let result = if self.is_parallel {
             match self.tupling {
                 Tupling::One => unsafe {
                     raw::primesieve_parallel_count_primes(self.start, self.stop)
@@ -233,7 +237,8 @@ impl Count {
                 },
                 Tupling::Six => unsafe { raw::primesieve_count_sextuplets(self.start, self.stop) },
             }
-        }
+        };
+        if result == raw::PRIMESIEVE_ERROR { Some(result) } else { None }
     }
 }
 
@@ -242,7 +247,7 @@ impl Default for Count {
 }
 
 impl From<Count> for u64 {
-    fn from(v: Count) -> u64 { v.get() }
+    fn from(v: Count) -> u64 { v.get().expect("primesieve error") }
 }
 
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
@@ -297,12 +302,13 @@ impl Nth {
         self
     }
 
-    pub fn get(self) -> u64 {
-        if self.is_parallel {
+    pub fn get(self) -> Option<u64> {
+        let result = if self.is_parallel {
             unsafe { raw::primesieve_nth_prime(self.n, self.start) }
         } else {
             unsafe { raw::primesieve_parallel_nth_prime(self.n, self.start) }
-        }
+        };
+        if result == raw::PRIMESIEVE_ERROR { Some(result) } else { None }
     }
 }
 
@@ -311,7 +317,7 @@ impl Default for Nth {
 }
 
 impl From<Nth> for u64 {
-    fn from(v: Nth) -> u64 { v.get() }
+    fn from(v: Nth) -> u64 { v.get().expect("primesieve error") }
 }
 
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
@@ -363,6 +369,75 @@ impl Print {
 
 impl Default for Print {
     fn default() -> Self { Print::new() }
+}
+
+pub unsafe trait Generable: Clone {
+    fn type_key() -> libc::c_int;
+}
+
+unsafe impl Generable for u16 {
+    fn type_key() -> libc::c_int { raw::UINT16_PRIMES }
+}
+
+unsafe impl Generable for u32 {
+    fn type_key() -> libc::c_int { raw::UINT32_PRIMES }
+}
+
+unsafe impl Generable for u64 {
+    fn type_key() -> libc::c_int { raw::UINT64_PRIMES }
+}
+
+#[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
+pub struct Generate {
+    pub start: u64,
+    pub stop: u64,
+}
+
+impl Generate {
+    pub fn new() -> Self {
+        Generate {
+            start: 0,
+            stop: max_stop::get(),
+        }
+    }
+
+    pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
+        self.start = start.into();
+        self
+    }
+
+    pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
+        self.stop = stop.into();
+        self
+    }
+
+    pub fn get<N: Generable>(self) -> Vec<N> {
+        let mut size: libc::size_t = 0;
+        let raw_arr = unsafe {
+            raw::primesieve_generate_primes(self.start, self.stop, &mut size, N::type_key())
+        };
+        let result: Vec<N> = unsafe {
+                                 slice::from_raw_parts(raw_arr as *mut N,
+                                                       num_cast::<libc::size_t, usize>(size)
+                                                           .expect("primesieve error"))
+                             }
+                             .to_owned();
+        unsafe {
+            raw::primesieve_free(raw_arr);
+        }
+        result
+    }
+    
+}
+
+impl Default for Generate {
+    fn default() -> Self { Generate::new() }
+}
+
+impl<N: Generable> Into<Vec<N>> for Generate {
+    fn into(self) -> Vec<N> {
+        self.get()
+    }
 }
 
 #[derive(Debug)]
