@@ -25,6 +25,59 @@ use snowflake::ProcessUniqueId;
 extern crate num_traits;
 use num_traits::cast::cast as num_cast;
 
+pub mod max_stop {
+    pub fn get() -> u64 { unsafe { super::raw::primesieve_get_max_stop() } }
+}
+
+pub mod sieve_size {
+    use super::num_traits::cast::cast as num_cast;
+
+    pub fn set<N: Into<u16>>(sieve_size: N) -> bool {
+        if let Some(n_) = num_cast::<u16, super::libc::c_int>(sieve_size.into()) {
+            if n_ >= 1 && n_ <= 2048 {
+                unsafe {
+                    super::raw::primesieve_set_sieve_size(n_);
+                }
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn get() -> u16 {
+        num_cast::<super::libc::c_int, u16>(unsafe { super::raw::primesieve_get_sieve_size() })
+            .unwrap_or_else(|| unreachable!())
+    }
+}
+
+pub mod num_threads {
+    use super::num_traits::cast::cast as num_cast;
+
+    pub fn set<N: Into<u16>>(sieve_size: N) -> bool {
+        if let Some(n_) = num_cast::<u16, super::libc::c_int>(sieve_size.into()) {
+            if n_ >= 1 && n_ <= 2048 {
+                unsafe {
+                    super::raw::primesieve_set_sieve_size(n_);
+                }
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    pub fn get() -> u16 {
+        num_cast::<super::libc::c_int, u16>(unsafe { super::raw::primesieve_get_sieve_size() })
+            .unwrap_or_else(|| unreachable!())
+    }
+}
+
+
 #[derive(Debug,PartialEq,Eq,PartialOrd,Ord,Hash,Clone,Copy)]
 pub enum Tupling {
     One = 1,
@@ -117,7 +170,7 @@ impl Count {
             tupling: Tupling::One,
             is_parallel: false,
             start: 0,
-            stop: unsafe { raw::primesieve_get_max_stop() },
+            stop: max_stop::get(),
         }
     }
 
@@ -259,6 +312,57 @@ impl Default for Nth {
 
 impl From<Nth> for u64 {
     fn from(v: Nth) -> u64 { v.get() }
+}
+
+#[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
+pub struct Print {
+    pub tupling: Tupling,
+    pub start: u64,
+    pub stop: u64,
+}
+
+impl Print {
+    pub fn new() -> Self {
+        Print {
+            tupling: Tupling::One,
+            start: 0,
+            stop: max_stop::get(),
+        }
+    }
+
+    pub fn tupling<T: ToTupling>(mut self, tupling: T) -> Option<Self> {
+        if let Some(t) = tupling.to_tupling() {
+            self.tupling = t;
+            Some(self)
+        } else {
+            None
+        }
+    }
+
+    pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
+        self.start = start.into();
+        self
+    }
+
+    pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
+        self.stop = stop.into();
+        self
+    }
+
+    pub fn execute(self) {
+        match self.tupling {
+            Tupling::One => unsafe { raw::primesieve_print_primes(self.start, self.stop) },
+            Tupling::Two => unsafe { raw::primesieve_print_twins(self.start, self.stop) },
+            Tupling::Three => unsafe { raw::primesieve_print_triplets(self.start, self.stop) },
+            Tupling::Four => unsafe { raw::primesieve_print_quadruplets(self.start, self.stop) },
+            Tupling::Five => unsafe { raw::primesieve_print_quintuplets(self.start, self.stop) },
+            Tupling::Six => unsafe { raw::primesieve_print_sextuplets(self.start, self.stop) },
+        }
+    }
+}
+
+impl Default for Print {
+    fn default() -> Self { Print::new() }
 }
 
 #[derive(Debug)]
