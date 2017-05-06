@@ -23,11 +23,13 @@ extern crate num_traits;
 use num_traits::cast::cast as num_cast;
 
 pub mod max_stop {
-    pub fn get() -> u64 { unsafe { super::raw::primesieve_get_max_stop() } }
+    pub fn get() -> u64 {
+        unsafe { super::raw::primesieve_get_max_stop() }
+    }
 }
 
 pub mod sieve_size {
-    use super::num_traits::cast::cast as num_cast;
+    use super::num_cast;
 
     pub fn set<N: Into<u16>>(sieve_size: N) -> bool {
         if let Some(n_) = num_cast::<u16, super::libc::c_int>(sieve_size.into()) {
@@ -93,7 +95,9 @@ pub enum Tupling {
 }
 
 impl Default for Tupling {
-    fn default() -> Self { Tupling::One }
+    fn default() -> Self {
+        Tupling::One
+    }
 }
 
 macro_rules! from_tupling_impl {
@@ -122,7 +126,9 @@ pub trait ToTupling {
 }
 
 impl ToTupling for Tupling {
-    fn to_tupling(self) -> Option<Tupling> { Some(self) }
+    fn to_tupling(self) -> Option<Tupling> {
+        Some(self)
+    }
 }
 
 macro_rules! to_tupling_impl {
@@ -238,16 +244,24 @@ impl Count {
                 Tupling::Six => unsafe { raw::primesieve_count_sextuplets(self.start, self.stop) },
             }
         };
-        if result == raw::PRIMESIEVE_ERROR { Some(result) } else { None }
+        if result == raw::PRIMESIEVE_ERROR {
+            Some(result)
+        } else {
+            None
+        }
     }
 }
 
 impl Default for Count {
-    fn default() -> Self { Count::new() }
+    fn default() -> Self {
+        Count::new()
+    }
 }
 
 impl From<Count> for u64 {
-    fn from(v: Count) -> u64 { v.get().expect("primesieve error") }
+    fn from(v: Count) -> u64 {
+        v.get().expect("primesieve error")
+    }
 }
 
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
@@ -308,16 +322,24 @@ impl Nth {
         } else {
             unsafe { raw::primesieve_parallel_nth_prime(self.n, self.start) }
         };
-        if result == raw::PRIMESIEVE_ERROR { Some(result) } else { None }
+        if result == raw::PRIMESIEVE_ERROR {
+            Some(result)
+        } else {
+            None
+        }
     }
 }
 
 impl Default for Nth {
-    fn default() -> Self { Nth::new() }
+    fn default() -> Self {
+        Nth::new()
+    }
 }
 
 impl From<Nth> for u64 {
-    fn from(v: Nth) -> u64 { v.get().expect("primesieve error") }
+    fn from(v: Nth) -> u64 {
+        v.get().expect("primesieve error")
+    }
 }
 
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
@@ -368,7 +390,9 @@ impl Print {
 }
 
 impl Default for Print {
-    fn default() -> Self { Print::new() }
+    fn default() -> Self {
+        Print::new()
+    }
 }
 
 pub unsafe trait Generable: Clone {
@@ -376,15 +400,21 @@ pub unsafe trait Generable: Clone {
 }
 
 unsafe impl Generable for u16 {
-    fn type_key() -> libc::c_int { raw::UINT16_PRIMES }
+    fn type_key() -> libc::c_int {
+        raw::UINT16_PRIMES
+    }
 }
 
 unsafe impl Generable for u32 {
-    fn type_key() -> libc::c_int { raw::UINT32_PRIMES }
+    fn type_key() -> libc::c_int {
+        raw::UINT32_PRIMES
+    }
 }
 
 unsafe impl Generable for u64 {
-    fn type_key() -> libc::c_int { raw::UINT64_PRIMES }
+    fn type_key() -> libc::c_int {
+        raw::UINT64_PRIMES
+    }
 }
 
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
@@ -417,21 +447,22 @@ impl Generate {
             raw::primesieve_generate_primes(self.start, self.stop, &mut size, N::type_key())
         };
         let result: Vec<N> = unsafe {
-                                 slice::from_raw_parts(raw_arr as *mut N,
+                slice::from_raw_parts(raw_arr as *mut N,
                                                        num_cast::<libc::size_t, usize>(size)
                                                            .expect("primesieve error"))
-                             }
-                             .to_owned();
+            }
+            .to_owned();
         unsafe {
             raw::primesieve_free(raw_arr);
         }
         result
     }
-    
 }
 
 impl Default for Generate {
-    fn default() -> Self { Generate::new() }
+    fn default() -> Self {
+        Generate::new()
+    }
 }
 
 impl<N: Generable> Into<Vec<N>> for Generate {
