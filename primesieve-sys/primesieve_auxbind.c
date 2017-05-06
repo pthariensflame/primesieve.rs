@@ -19,6 +19,6 @@ uint64_t primesieve_next_prime_auxbind(primesieve_iterator *pi) {
   return primesieve_next_prime(pi);
 }
 
-uint64_t primesieve_previous_prime_auxbind(primesieve_iterator *pi) {
-  return primesieve_previous_prime(pi);
+uint64_t primesieve_prev_prime_auxbind(primesieve_iterator *pi) {
+  return primesieve_prev_prime(pi);
 }

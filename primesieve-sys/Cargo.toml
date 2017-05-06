@@ -16,7 +16,7 @@
 [package]
 name = "primesieve-sys"
 description = "Raw bindings to the [primesieve](http://primesieve.org) C library"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Alexander Ronald Altman <alexanderaltman@me.com>"]
 license = "Apache-2.0"
 homepage = "https://github.com/pthariensflame/primesieve.rs"
@@ -30,7 +30,7 @@ path = "src/lib.rs"
 name = "primesieve_sys"
 
 [dependencies]
-libc = "~0.2.15"
+libc = "~0.2.22"
 
 [build-dependencies]
-gcc = "~0.3.32"
+gcc = "~0.3.45"

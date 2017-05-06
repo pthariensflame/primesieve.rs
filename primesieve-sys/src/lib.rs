@@ -61,7 +61,6 @@ extern "C" {
                                       -> *mut c_void;
     pub fn primesieve_generate_n_primes(n: uint64_t, start: uint64_t, type_: c_int) -> *mut c_void;
     pub fn primesieve_nth_prime(n: int64_t, start: uint64_t) -> uint64_t;
-    pub fn primesieve_parallel_nth_prime(n: int64_t, start: uint64_t) -> uint64_t;
     pub fn primesieve_count_primes(start: uint64_t, stop: uint64_t) -> uint64_t;
     pub fn primesieve_count_twins(start: uint64_t, stop: uint64_t) -> uint64_t;
     pub fn primesieve_count_triplets(start: uint64_t, stop: uint64_t) -> uint64_t;
@@ -80,16 +79,12 @@ extern "C" {
     pub fn primesieve_print_quadruplets(start: uint64_t, stop: uint64_t);
     pub fn primesieve_print_quintuplets(start: uint64_t, stop: uint64_t);
     pub fn primesieve_print_sextuplets(start: uint64_t, stop: uint64_t);
-    pub fn primesieve_callback_primes(start: uint64_t,
-                                      stop: uint64_t,
-                                      callback: extern "C" fn(prime: uint64_t));
+    pub fn primesieve_get_max_stop() -> uint64_t;
     pub fn primesieve_get_sieve_size() -> c_int;
     pub fn primesieve_get_num_threads() -> c_int;
-    pub fn primesieve_get_max_stop() -> uint64_t;
     pub fn primesieve_set_sieve_size(sieve_size: c_int);
     pub fn primesieve_set_num_threads(num_threads: c_int);
     pub fn primesieve_free(primes: *mut c_void);
-    pub fn primesieve_test() -> c_int;
     pub fn primesieve_version() -> *const c_char;
 
     // These `fn`s are from the C header "primesieve/primesieve_iterator.h".
@@ -100,30 +95,25 @@ extern "C" {
 
 // These `fn`s are from the C header "primesieve/primesieve_iterator.h", but
 // are declared as `static inline`, so we must bind to them in a roundabout way.
-#[inline]
+#[inline(always)]
 pub unsafe fn primesieve_next_prime(pi: *mut primesieve_iterator) -> uint64_t {
     primesieve_next_prime_auxbind(pi)
 }
-#[inline]
-pub unsafe fn primesieve_previous_prime(pi: *mut primesieve_iterator) -> uint64_t {
-    primesieve_previous_prime_auxbind(pi)
+#[inline(always)]
+pub unsafe fn primesieve_prev_prime(pi: *mut primesieve_iterator) -> uint64_t {
+    primesieve_prev_prime_auxbind(pi)
 }
 #[link(name = "primesieve_auxbind")]
 extern "C" {
     fn primesieve_next_prime_auxbind(pi: *mut primesieve_iterator) -> uint64_t;
-    fn primesieve_previous_prime_auxbind(pi: *mut primesieve_iterator) -> uint64_t;
+    fn primesieve_prev_prime_auxbind(pi: *mut primesieve_iterator) -> uint64_t;
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use super::libc::{c_int, uint64_t};
+    use super::libc::uint64_t;
     use std::mem;
-
-    #[test]
-    fn builtin_test() {
-        assert_eq!(unsafe { primesieve_test() }, 1 as c_int);
-    }
 
     #[test]
     fn iterator_test() {
@@ -136,7 +126,7 @@ mod test {
         unsafe {
             primesieve_skipto(&mut pi, 10 as uint64_t, 1 as uint64_t);
         }
-        let y: uint64_t = unsafe { primesieve_previous_prime(&mut pi) };
+        let y: uint64_t = unsafe { primesieve_prev_prime(&mut pi) };
         unsafe {
             primesieve_free_iterator(&mut pi);
         }
