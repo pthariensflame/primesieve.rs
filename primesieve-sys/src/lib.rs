@@ -97,11 +97,11 @@ extern "C" {
 
 // These `fn`s are from the C header "primesieve/primesieve_iterator.h", but
 // are declared as `static inline`, so we must bind to them in a roundabout way.
-#[inline(always)]
+#[inline]
 pub unsafe fn primesieve_next_prime(pi: *mut primesieve_iterator) -> uint64_t {
     primesieve_next_prime_auxbind(pi)
 }
-#[inline(always)]
+#[inline]
 pub unsafe fn primesieve_prev_prime(pi: *mut primesieve_iterator) -> uint64_t {
     primesieve_prev_prime_auxbind(pi)
 }
