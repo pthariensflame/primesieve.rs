@@ -23,6 +23,7 @@ extern crate num_traits;
 use num_traits::cast::cast as num_cast;
 
 pub mod max_stop {
+    #[inline]
     pub fn get() -> u64 {
         unsafe { super::raw::primesieve_get_max_stop() }
     }
@@ -46,6 +47,7 @@ pub mod sieve_size {
         }
     }
 
+    #[inline]
     pub fn get() -> u16 {
         num_cast::<super::libc::c_int, u16>(unsafe { super::raw::primesieve_get_sieve_size() })
             .unwrap_or_else(|| unreachable!())
@@ -77,6 +79,7 @@ pub mod num_threads {
         }
     }
 
+    #[inline]
     pub fn get() -> u64 {
         num_cast::<super::libc::c_int, u64>(unsafe { super::raw::primesieve_get_num_threads() })
             .unwrap_or_else(|| unreachable!())

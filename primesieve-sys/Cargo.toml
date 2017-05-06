@@ -16,12 +16,12 @@
 [package]
 name = "primesieve-sys"
 description = "Raw bindings to the [primesieve](http://primesieve.org) C library"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Alexander Ronald Altman <alexanderaltman@me.com>"]
 license = "Apache-2.0"
 homepage = "https://github.com/pthariensflame/primesieve.rs"
 repository = "https://github.com/pthariensflame/primesieve.rs"
-# documentation = "https://docs.rs/crate/primesieve-sys"
+documentation = "https://docs.rs/crate/primesieve-sys"
 keywords = ["bindings", "primes"]
 build = "build.rs"
 links = "primesieve"
@@ -30,8 +30,9 @@ links = "primesieve"
 path = "src/lib.rs"
 name = "primesieve_sys"
 
-[dependencies]
-libc = "~0.2.22"
+[dependencies.libc]
+version = "~0.2.22"
+default-features = false
 
 [build-dependencies]
 gcc = "~0.3.45"
