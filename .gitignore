@@ -1,4 +1,4 @@
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Archives.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Archives.gitignore
 
 # It's better to unpack these files and commit the raw source because
 # git has its own built in compression methods.
@@ -7,6 +7,7 @@
 *.rar
 *.zip
 *.gz
+*.tgz
 *.bzip
 *.bz2
 *.xz
@@ -29,7 +30,7 @@
 *.msp
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Tags.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Tags.gitignore
 
 # Ignore tags created by etags, ctags, gtags (GNU global) and cscope
 TAGS
@@ -42,6 +43,7 @@ gtags.files
 GTAGS
 GRTAGS
 GPATH
+GSYMS
 cscope.files
 cscope.out
 cscope.in.out
@@ -49,13 +51,13 @@ cscope.po.out
 
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/GPG.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/GPG.gitignore
 
 secring.*
 
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Emacs.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Emacs.gitignore
 
 # -*- mode: gitignore; -*-
 *~
@@ -100,11 +102,17 @@ flycheck_*.el
 # projectiles files
 .projectile
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Vim.gitignore
+# directory configuration
+.dir-locals.el
+
+
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Vim.gitignore
 
 # swap
-[._]*.s[a-w][a-z]
-[._]s[a-w][a-z]
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
 # session
 Session.vim
 # temporary
@@ -114,7 +122,7 @@ Session.vim
 tags
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Eclipse.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Eclipse.gitignore
 
 
 .metadata
@@ -129,9 +137,6 @@ local.properties
 .loadpath
 .recommenders
 
-# Eclipse Core
-.project
-
 # External tool builders
 .externalToolBuilders/
 
@@ -143,9 +148,6 @@ local.properties
 
 # CDT-specific (C/C++ Development Tooling)
 .cproject
-
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
 
 # Java annotation processor (APT)
 .factorypath
@@ -168,20 +170,27 @@ local.properties
 # Code Recommenders
 .recommenders/
 
+# Scala IDE specific (Scala & Java development for Eclipse)
+.cache-main
+.scala_dependencies
+.worksheet
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/VisualStudioCode.gitignore
+
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/VisualStudioCode.gitignore
 
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+!.vscode/extensions.json
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Windows.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Windows.gitignore
 
-# Windows image file caches
+# Windows thumbnail cache files
 Thumbs.db
 ehthumbs.db
+ehthumbs_vista.db
 
 # Folder config file
 Desktop.ini
@@ -199,7 +208,7 @@ $RECYCLE.BIN/
 *.lnk
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/Linux.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Linux.gitignore
 
 *~
 
@@ -212,8 +221,11 @@ $RECYCLE.BIN/
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
 
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Global/OSX.gitignore
+
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/macOS.gitignore
 
 *.DS_Store
 .AppleDouble
@@ -242,7 +254,15 @@ Temporary Items
 .apdisk
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/C++.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Global/Dropbox.gitignore
+
+# Dropbox settings and caches
+.dropbox
+.dropbox.attr
+.dropbox.cache
+
+
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/C++.gitignore
 
 # Prerequisites
 *.d
@@ -278,7 +298,7 @@ Temporary Items
 *.app
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/C.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/C.gitignore
 
 # Prerequisites
 *.d
@@ -288,6 +308,11 @@ Temporary Items
 *.ko
 *.obj
 *.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
 
 # Precompiled Headers
 *.gch
@@ -316,13 +341,29 @@ Temporary Items
 # Debug files
 *.dSYM/
 *.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
 
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Autotools.gitignore
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Autotools.gitignore
 
 # http://www.gnu.org/software/automake
 
 Makefile.in
+/ar-lib
+/mdate-sh
+/py-compile
+/test-driver
+/ylwrap
 
 # http://www.gnu.org/software/autoconf
 
@@ -331,7 +372,9 @@ Makefile.in
 /autoscan-*.log
 /aclocal.m4
 /compile
+/config.guess
 /config.h.in
+/config.sub
 /configure
 /configure.scan
 /depcomp
@@ -339,8 +382,16 @@ Makefile.in
 /missing
 /stamp-h1
 
+# https://www.gnu.org/software/libtool/
 
-### https://raw.github.com/github/gitignore/2664dad61f3fda7755acc70ceb5aac4b1e956981/Rust.gitignore
+/ltmain.sh
+
+# http://www.gnu.org/software/texinfo
+
+/texinfo.tex
+
+
+### https://raw.github.com/github/gitignore/c0c1a480a906df0e023f3250cf2ad82f1612be67/Rust.gitignore
 
 # Generated by Cargo
 # will have compiled files and executables
@@ -349,5 +400,8 @@ Makefile.in
 # Remove Cargo.lock from gitignore if creating an executable, leave it for libraries
 # More information here http://doc.crates.io/guide.html#cargotoml-vs-cargolock
 Cargo.lock
+
+# These are backup files generated by rustfmt
+**/*.rs.bk
 
 
