@@ -15,7 +15,7 @@
 
 use std::slice;
 
-pub extern crate libc;
+extern crate libc;
 
 pub extern crate primesieve_sys as raw;
 
@@ -142,6 +142,7 @@ impl ToTupling for Tupling {
 macro_rules! to_tupling_impl {
     ($t:ty) => {
         impl $crate::ToTupling for $t {
+            #[inline]
             fn to_tupling(self) -> ::std::option::Option<$crate::Tupling> {
                 if self == 1 {
                     ::std::option::Option::Some($crate::Tupling::One)
@@ -212,16 +213,12 @@ impl Count {
 
     pub fn run(self) -> Option<u64> {
         let result = match self.tupling {
-                Tupling::One => unsafe { raw::primesieve_count_primes(self.start, self.stop) },
-                Tupling::Two => unsafe { raw::primesieve_count_twins(self.start, self.stop) },
-                Tupling::Three => unsafe { raw::primesieve_count_triplets(self.start, self.stop) },
-                Tupling::Four => unsafe {
-                    raw::primesieve_count_quadruplets(self.start, self.stop)
-                },
-                Tupling::Five => unsafe {
-                    raw::primesieve_count_quintuplets(self.start, self.stop)
-                },
-                Tupling::Six => unsafe { raw::primesieve_count_sextuplets(self.start, self.stop) },
+            Tupling::One => unsafe { raw::primesieve_count_primes(self.start, self.stop) },
+            Tupling::Two => unsafe { raw::primesieve_count_twins(self.start, self.stop) },
+            Tupling::Three => unsafe { raw::primesieve_count_triplets(self.start, self.stop) },
+            Tupling::Four => unsafe { raw::primesieve_count_quadruplets(self.start, self.stop) },
+            Tupling::Five => unsafe { raw::primesieve_count_quintuplets(self.start, self.stop) },
+            Tupling::Six => unsafe { raw::primesieve_count_sextuplets(self.start, self.stop) },
         };
         if result != raw::PRIMESIEVE_ERROR {
             Some(result)
@@ -247,10 +244,7 @@ pub struct Nth {
 impl Nth {
     #[inline]
     pub fn new() -> Self {
-        Nth {
-            n: 0,
-            start: 0,
-        }
+        Nth { n: 0, start: 0 }
     }
 
     pub fn after<N: Into<u64>>(mut self, n: N) -> Option<Self> {
@@ -284,7 +278,8 @@ impl Nth {
         self
     }
 
-    pub fn get(self) -> Option<u64> {
+    #[inline]
+    pub fn run(self) -> Option<u64> {
         let result = unsafe { raw::primesieve_nth_prime(self.n, self.start) };
         if result != raw::PRIMESIEVE_ERROR {
             Some(result)
@@ -298,13 +293,6 @@ impl Default for Nth {
     #[inline]
     fn default() -> Self {
         Nth::new()
-    }
-}
-
-impl From<Nth> for u64 {
-    #[inline]
-    fn from(v: Nth) -> u64 {
-        v.get().expect("primesieve error")
     }
 }
 
@@ -412,7 +400,7 @@ impl Generate {
         self
     }
 
-    pub fn get<N: Generable>(self) -> Vec<N> {
+    pub fn run<N: Generable>(self) -> Vec<N> {
         let mut size: libc::size_t = 0;
         let raw_arr = unsafe {
             raw::primesieve_generate_primes(self.start, self.stop, &mut size, N::type_key())
@@ -433,12 +421,6 @@ impl Generate {
 impl Default for Generate {
     fn default() -> Self {
         Generate::new()
-    }
-}
-
-impl<N: Generable> Into<Vec<N>> for Generate {
-    fn into(self) -> Vec<N> {
-        self.get()
     }
 }
 
