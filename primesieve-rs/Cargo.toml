@@ -28,6 +28,6 @@ path = "src/lib.rs"
 
 [dependencies]
 libc = "~0.2.22"
-primesieve-sys = "~0.2.0"
+primesieve-sys = "~0.2.3"
 num-traits = "~0.1.37"
 odds = "~0.2.25"
