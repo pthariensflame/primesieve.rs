@@ -22,6 +22,9 @@ pub extern crate primesieve_sys as raw;
 extern crate num_traits;
 use num_traits::cast::cast as num_cast;
 
+extern crate odds;
+use odds::debug_assert_unreachable;
+
 pub mod max_stop {
     #[inline]
     pub fn get() -> u64 {
@@ -30,7 +33,7 @@ pub mod max_stop {
 }
 
 pub mod sieve_size {
-    use super::num_cast;
+    use super::{debug_assert_unreachable, num_cast};
 
     pub fn set<N: Into<u16>>(sieve_size: N) -> bool {
         if let Some(n_) = num_cast::<u16, super::libc::c_int>(sieve_size.into()) {
@@ -50,12 +53,12 @@ pub mod sieve_size {
     #[inline]
     pub fn get() -> u16 {
         num_cast::<super::libc::c_int, u16>(unsafe { super::raw::primesieve_get_sieve_size() })
-            .unwrap_or_else(|| unreachable!())
+            .unwrap_or_else(|| unsafe { debug_assert_unreachable() })
     }
 }
 
 pub mod num_threads {
-    use super::num_traits::cast::cast as num_cast;
+    use super::{debug_assert_unreachable, num_cast};
 
     pub fn set<N: Into<Option<u64>>>(num_threads: N) -> bool {
         if let Some(n) = num_threads.into() {
@@ -82,7 +85,7 @@ pub mod num_threads {
     #[inline]
     pub fn get() -> u64 {
         num_cast::<super::libc::c_int, u64>(unsafe { super::raw::primesieve_get_num_threads() })
-            .unwrap_or_else(|| unreachable!())
+            .unwrap_or_else(|| unsafe { debug_assert_unreachable() })
     }
 }
 
@@ -98,6 +101,7 @@ pub enum Tupling {
 }
 
 impl Default for Tupling {
+    #[inline]
     fn default() -> Self {
         Tupling::One
     }
@@ -129,6 +133,7 @@ pub trait ToTupling {
 }
 
 impl ToTupling for Tupling {
+    #[inline]
     fn to_tupling(self) -> Option<Tupling> {
         Some(self)
     }
@@ -172,16 +177,15 @@ to_tupling_impl!(isize);
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
 pub struct Count {
     pub tupling: Tupling,
-    pub is_parallel: bool,
     pub start: u64,
     pub stop: u64,
 }
 
 impl Count {
+    #[inline]
     pub fn new() -> Self {
         Count {
             tupling: Tupling::One,
-            is_parallel: false,
             start: 0,
             stop: max_stop::get(),
         }
@@ -196,11 +200,6 @@ impl Count {
         }
     }
 
-    pub fn is_parallel<B: Into<bool>>(mut self, is_parallel: B) -> Self {
-        self.is_parallel = is_parallel.into();
-        self
-    }
-
     pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
         self.start = start.into();
         self
@@ -211,30 +210,8 @@ impl Count {
         self
     }
 
-    pub fn get(self) -> Option<u64> {
-        let result = if self.is_parallel {
-            match self.tupling {
-                Tupling::One => unsafe {
-                    raw::primesieve_parallel_count_primes(self.start, self.stop)
-                },
-                Tupling::Two => unsafe {
-                    raw::primesieve_parallel_count_twins(self.start, self.stop)
-                },
-                Tupling::Three => unsafe {
-                    raw::primesieve_parallel_count_triplets(self.start, self.stop)
-                },
-                Tupling::Four => unsafe {
-                    raw::primesieve_parallel_count_quadruplets(self.start, self.stop)
-                },
-                Tupling::Five => unsafe {
-                    raw::primesieve_parallel_count_quintuplets(self.start, self.stop)
-                },
-                Tupling::Six => unsafe {
-                    raw::primesieve_parallel_count_sextuplets(self.start, self.stop)
-                },
-            }
-        } else {
-            match self.tupling {
+    pub fn run(self) -> Option<u64> {
+        let result = match self.tupling {
                 Tupling::One => unsafe { raw::primesieve_count_primes(self.start, self.stop) },
                 Tupling::Two => unsafe { raw::primesieve_count_twins(self.start, self.stop) },
                 Tupling::Three => unsafe { raw::primesieve_count_triplets(self.start, self.stop) },
@@ -245,9 +222,8 @@ impl Count {
                     raw::primesieve_count_quintuplets(self.start, self.stop)
                 },
                 Tupling::Six => unsafe { raw::primesieve_count_sextuplets(self.start, self.stop) },
-            }
         };
-        if result == raw::PRIMESIEVE_ERROR {
+        if result != raw::PRIMESIEVE_ERROR {
             Some(result)
         } else {
             None
@@ -256,36 +232,25 @@ impl Count {
 }
 
 impl Default for Count {
+    #[inline]
     fn default() -> Self {
         Count::new()
     }
 }
 
-impl From<Count> for u64 {
-    fn from(v: Count) -> u64 {
-        v.get().expect("primesieve error")
-    }
-}
-
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
 pub struct Nth {
-    pub is_parallel: bool,
     pub n: i64,
     pub start: u64,
 }
 
 impl Nth {
+    #[inline]
     pub fn new() -> Self {
         Nth {
-            is_parallel: false,
             n: 0,
             start: 0,
         }
-    }
-
-    pub fn is_parallel<B: Into<bool>>(mut self, is_parallel: B) -> Self {
-        self.is_parallel = is_parallel.into();
-        self
     }
 
     pub fn after<N: Into<u64>>(mut self, n: N) -> Option<Self> {
@@ -320,12 +285,8 @@ impl Nth {
     }
 
     pub fn get(self) -> Option<u64> {
-        let result = if self.is_parallel {
-            unsafe { raw::primesieve_nth_prime(self.n, self.start) }
-        } else {
-            unsafe { raw::primesieve_parallel_nth_prime(self.n, self.start) }
-        };
-        if result == raw::PRIMESIEVE_ERROR {
+        let result = unsafe { raw::primesieve_nth_prime(self.n, self.start) };
+        if result != raw::PRIMESIEVE_ERROR {
             Some(result)
         } else {
             None
@@ -334,12 +295,14 @@ impl Nth {
 }
 
 impl Default for Nth {
+    #[inline]
     fn default() -> Self {
         Nth::new()
     }
 }
 
 impl From<Nth> for u64 {
+    #[inline]
     fn from(v: Nth) -> u64 {
         v.get().expect("primesieve error")
     }
@@ -353,6 +316,7 @@ pub struct Print {
 }
 
 impl Print {
+    #[inline]
     pub fn new() -> Self {
         Print {
             tupling: Tupling::One,
@@ -393,6 +357,7 @@ impl Print {
 }
 
 impl Default for Print {
+    #[inline]
     fn default() -> Self {
         Print::new()
     }
@@ -403,18 +368,21 @@ pub unsafe trait Generable: Clone {
 }
 
 unsafe impl Generable for u16 {
+    #[inline]
     fn type_key() -> libc::c_int {
         raw::UINT16_PRIMES
     }
 }
 
 unsafe impl Generable for u32 {
+    #[inline]
     fn type_key() -> libc::c_int {
         raw::UINT32_PRIMES
     }
 }
 
 unsafe impl Generable for u64 {
+    #[inline]
     fn type_key() -> libc::c_int {
         raw::UINT64_PRIMES
     }
