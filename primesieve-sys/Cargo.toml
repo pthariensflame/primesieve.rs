@@ -16,7 +16,7 @@
 [package]
 name = "primesieve-sys"
 description = "Raw bindings to the [primesieve](http://primesieve.org) C library"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Alexander Ronald Altman <alexanderaltman@me.com>"]
 license = "Apache-2.0"
 homepage = "https://github.com/pthariensflame/primesieve.rs"

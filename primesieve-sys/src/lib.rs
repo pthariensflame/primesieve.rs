@@ -41,6 +41,7 @@ pub const UINT64_PRIMES: c_int = 13;
 // This `struct` is from the C header "primesieve/primesieve_iterator.h".
 #[no_mangle]
 #[repr(C)]
+#[derive(Debug,Clone,Copy)]
 pub struct primesieve_iterator {
     pub i_: size_t,
     pub last_idx_: size_t,

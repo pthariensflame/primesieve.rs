@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::slice;
+use std::{mem, slice};
 
 extern crate libc;
 
@@ -21,6 +21,7 @@ pub extern crate primesieve_sys as raw;
 
 extern crate num_traits;
 use num_traits::cast::cast as num_cast;
+use num_traits::clamp;
 
 extern crate odds;
 use odds::debug_assert_unreachable;
@@ -376,6 +377,27 @@ unsafe impl Generable for u64 {
     }
 }
 
+unsafe impl Generable for i16 {
+    #[inline]
+    fn type_key() -> libc::c_int {
+        raw::INT16_PRIMES
+    }
+}
+
+unsafe impl Generable for i32 {
+    #[inline]
+    fn type_key() -> libc::c_int {
+        raw::INT32_PRIMES
+    }
+}
+
+unsafe impl Generable for i64 {
+    #[inline]
+    fn type_key() -> libc::c_int {
+        raw::INT64_PRIMES
+    }
+}
+
 #[derive(Debug,PartialEq,Eq,Hash,Clone,Copy)]
 pub struct Generate {
     pub start: u64,
@@ -383,6 +405,7 @@ pub struct Generate {
 }
 
 impl Generate {
+    #[inline]
     pub fn new() -> Self {
         Generate {
             start: 0,
@@ -396,7 +419,7 @@ impl Generate {
     }
 
     pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
-        self.stop = stop.into();
+        self.stop = u64::max(stop.into(), max_stop::get());
         self
     }
 
@@ -419,6 +442,7 @@ impl Generate {
 }
 
 impl Default for Generate {
+    #[inline]
     fn default() -> Self {
         Generate::new()
     }
@@ -426,5 +450,30 @@ impl Default for Generate {
 
 #[derive(Debug)]
 pub struct Iter {
-    raw_iter: *mut raw::primesieve_iterator,
+    
+    raw_iter: Box<raw::primesieve_iterator>,
+}
+
+impl Iter {
+    pub fn new() -> Self {
+        let ri = Box::into_raw(Box::new(unsafe { mem::zeroed::<raw::primesieve_iterator>() }));
+        raw::primesieve_init(ri);
+        Iter {
+            
+            raw_iter: ri,
+        }
+    }
+}
+
+impl Default for Iter {
+    #[inline]
+    fn default() -> Self {
+        Iter::new()
+    }
+}
+
+impl Drop for Iter {
+    fn drop(&mut self) {
+        self.raw_iter
+    }
 }
