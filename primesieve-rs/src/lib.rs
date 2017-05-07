@@ -193,22 +193,18 @@ impl Count {
         }
     }
 
-    pub fn tupling<T: ToTupling>(mut self, tupling: T) -> Option<Self> {
-        if let Some(t) = tupling.to_tupling() {
-            self.tupling = t;
-            Some(self)
-        } else {
-            None
-        }
+    pub fn tupling<T: ToTupling>(mut self, tupling: T) -> Self {
+        self.tupling = tupling.to_tupling().expect("invalid tupling");
+        self
     }
 
     pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
-        self.start = start.into();
+        self.start = clamp(start.into(), 0, max_stop::get());
         self
     }
 
     pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
-        self.stop = stop.into();
+        self.stop = clamp(stop.into(), 0, max_stop::get());
         self
     }
 
@@ -275,7 +271,7 @@ impl Nth {
     }
 
     pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
-        self.start = start.into();
+        self.start = clamp(start.into(), 0, max_stop::get());
         self
     }
 
@@ -324,12 +320,12 @@ impl Print {
     }
 
     pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
-        self.start = start.into();
+        self.start = clamp(start.into(), 0, max_stop::get());
         self
     }
 
     pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
-        self.stop = stop.into();
+        self.stop = clamp(stop.into(), 0, max_stop::get());
         self
     }
 
@@ -414,12 +410,12 @@ impl Generate {
     }
 
     pub fn start<N: Into<u64>>(mut self, start: N) -> Self {
-        self.start = start.into();
+        self.start = clamp(start.into(), 0, max_stop::get());
         self
     }
 
     pub fn stop<N: Into<u64>>(mut self, stop: N) -> Self {
-        self.stop = u64::max(stop.into(), max_stop::get());
+        self.stop = clamp(stop.into(), 0, max_stop::get());
         self
     }
 
@@ -450,17 +446,17 @@ impl Default for Generate {
 
 #[derive(Debug)]
 pub struct Iter {
-    
     raw_iter: Box<raw::primesieve_iterator>,
+    is_reversed: bool,
 }
 
 impl Iter {
     pub fn new() -> Self {
-        let ri = Box::into_raw(Box::new(unsafe { mem::zeroed::<raw::primesieve_iterator>() }));
-        raw::primesieve_init(ri);
+        let mut ri = Box::new(unsafe { mem::zeroed::<raw::primesieve_iterator>() });
+        unsafe { raw::primesieve_init(ri.as_mut()) };
         Iter {
-            
             raw_iter: ri,
+            is_reversed: false,
         }
     }
 }
@@ -474,6 +470,6 @@ impl Default for Iter {
 
 impl Drop for Iter {
     fn drop(&mut self) {
-        self.raw_iter
+        unsafe { raw::primesieve_free_iterator(self.raw_iter.as_mut()) };
     }
 }
